@@ -18,12 +18,12 @@ server.get('/login', (req, res) => {
       response_type: 'code',
       client_id: process.env.SPOTIFY_CLIENT_ID,
       scope: 'user-read-private user-read-email',
-      redirect_uri: 'http://localhost:3001/callback'
+      redirect_uri: 'http://localhost:3001/auth/spotify/callback'
     }))
 
 })
 
-server.get('/callback', (req, res) => {
+server.get('/auth/spotify/callback', (req, res) => {
     const code = req.query.code || null
     const spotifyAPIRequest = {
         url: 'https://accounts.spotify.com/api/token',
@@ -44,6 +44,8 @@ server.get('/callback', (req, res) => {
     axios(spotifyAPIRequest)
     .then(spotifyResponse => {
         const uri = 'http://localhost:3000/songs'
+
+        // potentially you could save the access_token for reuse
         const access_token = spotifyResponse.data.access_token
         res.redirect(uri + '?access_token=' + access_token)
     })
